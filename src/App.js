@@ -29,7 +29,8 @@ class App extends Component {
       username: '',
       password: '',
       password_confirmation: '',
-      auth: Auth.isUserAuthenticated()
+      auth: Auth.isUserAuthenticated(),
+      typeOfModal: ''
   	};
 
   	this.openModal = this.openModal.bind(this);
@@ -47,60 +48,14 @@ class App extends Component {
     });
   }
 
-  openModal() {
-  	this.setState({modalIsOpen: true});
-  	console.log("modal open!");
-  }
-
-   afterOpenModal() {
-    this.subtitle.style.color = '#f00';
-  }
-
-  closeModal() {
-    this.setState({modalIsOpen: false});
-  }
-
-  handleRegisterSubmit(e, data) {
-    e.preventDefault();
-    fetch('http://localhost:3002/api/v1/users', {
-      method: 'POST',
-      body: JSON.stringify({
-        user: data,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }).then(res => res.json())
-    .then(res => {
-        Auth.authenticateToken(res.token);
-        this.setState({
-          auth: Auth.isUserAuthenticated(),
-        })
-      }).catch(err => {
-        console.log(err);
-      })
-  }
-
-  render() {
-    return (
-      
-      <div className="App">
-      	<nav className="navbar">
-      	  <ul>
-      	    <li><Link to="/">Home</Link></li>
-      	    <li onClick={this.openModal}>Sign Up</li>
-            <li>Login</li>
-            <li>Logout</li>
-      	  </ul>
-      	</nav>
-
-      	<Route path="/" component={Home} />                                                                                  
-
-      	<Modal
+  renderModal() {
+   if (this.state.typeOfModal === 'register') {
+      return (
+        <Modal
           isOpen={this.state.modalIsOpen}
           onRequestClose={this.closeModal}
           style={customStyles}
-          contentLabel="Example Modal"
+          contentLabel="Register Modal"
         >
 
           <h2 ref={subtitle => this.subtitle = subtitle}>Sign Up</h2>
@@ -124,6 +79,110 @@ class App extends Component {
             </div>
           </form>
         </Modal>
+      )
+    } 
+    else {
+      return (
+        <Modal
+          isOpen={this.state.modalIsOpen}
+          onRequestClose={this.closeModal}
+          style={customStyles}
+          contentLabel="Login Modal"
+        >
+
+          <h2 ref={subtitle => this.subtitle = subtitle}>Login</h2>
+
+          <form onSubmit={(e) => this.handleLoginSubmit(e, this.state)}>
+            <div className="user-input">
+              <label>Email</label>
+              <input onChange={this.handleChange} className="input" type="text" name="email"/>
+            </div>
+            <div className="user-input">
+              <label>Username</label>
+              <input onChange={this.handleChange} className="input" type="text" name="username"/>
+            </div>
+            <div className="user-input">
+              <label>Password</label>
+              <input onChange={this.handleChange} className="input" type="text" name="password"/>
+            </div>
+            <div className="form-buttons">
+              <button type="submit">Submit</button>
+              <button onClick={this.closeModal}>Close</button>
+            </div>
+          </form>
+        </Modal>
+      );
+    }
+  }
+
+  openModal(popup) {
+    this.setState({ typeOfModal: popup, modalIsOpen: true })
+  	console.log("modal open!");
+  }
+
+   afterOpenModal() {
+    this.subtitle.style.color = '#f00';
+  }
+
+  closeModal() {
+    this.setState({modalIsOpen: false});
+  }
+
+  handleRegisterSubmit(e, data) {
+    e.preventDefault();
+    fetch('http://localhost:3002/api/v1/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        user: data,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json())
+    .then(res => {
+        console.log(res);
+        Auth.authenticateToken(res.token);
+        this.setState({
+          auth: Auth.isUserAuthenticated(),
+        })
+      }).catch(err => {
+        console.log(err);
+      })
+  }
+
+  handleLoginSubmit(e, data) {
+    e.preventDefault();
+    fetch('http://localhost:3002/api/v1/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      }  
+    }).then(res => res.json())
+    .then(res => {
+      console.log(res);
+      Auth.authenticateToken(res.token);
+      this.setState({
+        auth: Auth.isUserAuthenticated()
+      })
+    }).catch(err => console.log(err));
+  }
+
+  render() {
+    return (
+      
+      <div className="App">
+      	<nav className="navbar">
+      	  <ul>
+      	    <li><Link to="/">Home</Link></li>
+      	    <li onClick={(e) => this.openModal('register')}>Sign Up</li>
+            <li onClick={(e) => this.openModal('login')}>Login</li>
+            <li>Logout</li>
+      	  </ul>
+      	</nav>
+        {this.renderModal()}    
+      	<Route path="/" component={Home} /> 
+       
       </div>
     );
   }
