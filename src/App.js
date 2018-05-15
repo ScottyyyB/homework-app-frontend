@@ -144,8 +144,8 @@ class App extends Component {
         console.log(res);
         Auth.authenticateToken(res.token);
         this.setState({
-          auth: Auth.isUserAuthenticated(),
-        })
+          auth: Auth.isUserAuthenticated()
+        });
       }).catch(err => {
         console.log(err);
       })
@@ -164,7 +164,7 @@ class App extends Component {
       console.log(res);
       Auth.authenticateToken(res.token);
       this.setState({
-        auth: Auth.isUserAuthenticated(),
+        auth: Auth.isUserAuthenticated()
       })
     }).catch(err => console.log(err));
   }
@@ -179,8 +179,8 @@ class App extends Component {
     }).then(res => {
       Auth.deauthenticateToken();
        this.setState({
-        auth: Auth.isUserAuthenticated(),
-      })
+        auth: Auth.isUserAuthenticated()
+      });
     }).catch(err => console.log(err));
   }
 
