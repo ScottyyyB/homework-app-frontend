@@ -38,6 +38,7 @@ class App extends Component {
   	this.closeModal = this.closeModal.bind(this);
     this.handleRegisterSubmit = this.handleRegisterSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   handleChange(e) {
@@ -143,8 +144,8 @@ class App extends Component {
         console.log(res);
         Auth.authenticateToken(res.token);
         this.setState({
-          auth: Auth.isUserAuthenticated(),
-        })
+          auth: Auth.isUserAuthenticated()
+        });
       }).catch(err => {
         console.log(err);
       })
@@ -168,6 +169,21 @@ class App extends Component {
     }).catch(err => console.log(err));
   }
 
+  handleLogout() {
+    fetch('http://localhost:3002/api/v1/logout', {
+      method: 'DELETE',
+      headers: {
+        token: Auth.getToken(),
+        'Authorization': `Token ${Auth.getToken()}`,
+      },
+    }).then(res => {
+      Auth.deauthenticateToken();
+       this.setState({
+        auth: Auth.isUserAuthenticated()
+      });
+    }).catch(err => console.log(err));
+  }
+
   render() {
     return (
       
@@ -176,9 +192,9 @@ class App extends Component {
       	  <ul>
       	    <li><Link to="/">Home</Link></li>
       	    <li onClick={(e) => this.openModal('register')}>Sign Up</li>
-            <li onClick={(e) => this.openModal('login')}>Login</li>
-            <li>Logout</li>
-      	  </ul>
+            {!this.state.auth && <li onClick={(e) => this.openModal('login')}>Login</li>}
+      	    {this.state.auth && <li onClick={this.handleLogout}>Logout</li>}
+          </ul>
       	</nav>
         {this.renderModal()}    
       	<Route path="/" component={Home} /> 
