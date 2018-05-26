@@ -4,7 +4,7 @@ class Auth {
   }
 
   static isUserAuthenticated() {
-  	return sessionStorage.getItem('token') !== null;
+  	return sessionStorage.getItem('token') !== null
   }
 
   static deauthenticateToken() {

@@ -95,10 +95,6 @@ class App extends Component {
 
           <form onSubmit={(e) => this.handleLoginSubmit(e, this.state)}>
             <div className="user-input">
-              <label>Email</label>
-              <input onChange={this.handleChange} className="input" type="text" name="email"/>
-            </div>
-            <div className="user-input">
               <label>Username</label>
               <input onChange={this.handleChange} className="input" type="text" name="username"/>
             </div>
@@ -161,12 +157,13 @@ class App extends Component {
       }  
     }).then(res => res.json())
     .then(res => {
-      console.log(res);
-      Auth.authenticateToken(res.token);
-      this.setState({
-        auth: Auth.isUserAuthenticated()
-      })
-    }).catch(err => console.log(err));
+        Auth.authenticateToken(res.token);
+        this.setState({
+          auth: Auth.isUserAuthenticated()
+        })
+    }).catch(err => {
+      console.log(err);
+    })
   }
 
   handleLogout() {
@@ -197,8 +194,7 @@ class App extends Component {
           </ul>
       	</nav>
         {this.renderModal()}    
-      	<Route path="/" component={Home} /> 
-       
+      	<Route path="/" component={Home} />  
       </div>
     );
   }
