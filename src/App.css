@@ -5,3 +5,11 @@
 .user-input label {
   display: block;
 }
+
+.user-input {
+  margin: 20px;
+}
+
+.user-input span {
+  margin: 10px 5px;
+}

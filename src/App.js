@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import Home from './components/Home';
+import ClassroomForm from './components/ClassroomForm';
 import Modal from 'react-modal';
 import Auth from './modules/Auth';
 
 import { Link, Route, Switch } from 'react-router-dom';
+import { Redirect } from 'react-router'
 
 import './App.css';
 
@@ -26,11 +28,15 @@ class App extends Component {
 
   	this.state = {
       email: '',
-      username: '',
+      name: '',
       password: '',
-      password_confirmation: '',
+      teacher: false,
+      student: true,
+      grade: 9,
       auth: Auth.isUserAuthenticated(),
-      typeOfModal: ''
+      typeOfModal: '',
+      currentUser: Auth.getName(),
+      isTeacher: Auth.getTeacher()
   	};
 
   	this.openModal = this.openModal.bind(this);
@@ -39,6 +45,11 @@ class App extends Component {
     this.handleRegisterSubmit = this.handleRegisterSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
+    this.handleCheckBox = this.handleCheckBox.bind(this);
+  }
+
+  gradeCheck = (event) => {
+    return this.state.student ? 9 : null;
   }
 
   handleChange(e) {
@@ -47,6 +58,21 @@ class App extends Component {
     this.setState({
       [name]: value
     });
+  }
+
+  handleCheckBox(e) {
+    const name = e.target.name;
+    const opposite =  ['student', 'teacher'].find(item => item != name);
+    const gradeVal = opposite == 'teacher' ? null : this.state.grade;
+   
+    this.setState({
+      [name]: document.getElementById(`${name}Check`).checked = true,
+      [opposite]: document.getElementById(`${opposite}Check`).checked = false,
+    });
+  } 
+
+  updateCheck() {
+    
   }
 
   renderModal() {
@@ -64,16 +90,30 @@ class App extends Component {
           <form onSubmit={(e) => this.handleRegisterSubmit(e, this.state)}>
             <div className="user-input">
               <label>Email</label>
-              <input onChange={this.handleChange} className="input" type="text" name="email"/>
+              <input onChange={this.handleChange} value={this.state.email} className="input" type="text" name="email"/>
             </div>
             <div className="user-input">
-              <label>Username</label>
-              <input onChange={this.handleChange} className="input" type="text" name="username"/>
+              <label>Name</label>
+              <input onChange={this.handleChange} value={this.state.name} className="input" type="text" name="name"/>
             </div>
             <div className="user-input">
               <label>Password</label>
-              <input onChange={this.handleChange} className="input" type="text" name="password"/>
+              <input onChange={this.handleChange} value={this.state.password} className="input" type="text" name="password"/>
             </div>
+            <div className="user-input">
+              <label>Student</label>
+              <input onChange={this.handleCheckBox} type="checkbox" name="student" checked={this.state.student} id="studentCheck" /><br />
+              <label>Teacher</label>
+              <input onChange={this.handleCheckBox} type="checkbox" name="teacher" checked={this.state.teacher} id="teacherCheck" />
+            </div>
+            {this.state.student && <div className="user-input">
+              <select onChange={this.handleChange} name="grade">
+                <option name="grade" value={9}>Grade 9</option>
+                <option name="grade" value={10}>Grade 10</option>
+                <option name="grade" value={11}>Grade 11</option>
+                <option name="grade" value={12}>Grade 12</option>
+              </select>
+            </div>}
             <div className="form-buttons">
               <button type="submit">Submit</button>
               <button onClick={this.closeModal}>Close</button>
@@ -95,16 +135,12 @@ class App extends Component {
 
           <form onSubmit={(e) => this.handleLoginSubmit(e, this.state)}>
             <div className="user-input">
-              <label>Email</label>
-              <input onChange={this.handleChange} className="input" type="text" name="email"/>
-            </div>
-            <div className="user-input">
-              <label>Username</label>
-              <input onChange={this.handleChange} className="input" type="text" name="username"/>
+              <label>Name</label>
+              <input onChange={this.handleChange} value={this.state.name} className="input" type="text" name="name"/>
             </div>
             <div className="user-input">
               <label>Password</label>
-              <input onChange={this.handleChange} className="input" type="text" name="password"/>
+              <input onChange={this.handleChange} value={this.state.password} className="input" type="text" name="password"/>
             </div>
             <div className="form-buttons">
               <button type="submit">Submit</button>
@@ -134,7 +170,7 @@ class App extends Component {
     fetch('http://localhost:3002/api/v1/users', {
       method: 'POST',
       body: JSON.stringify({
-        user: data,
+        user: data
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -142,9 +178,11 @@ class App extends Component {
     }).then(res => res.json())
     .then(res => {
         console.log(res);
-        Auth.authenticateToken(res.token);
+        Auth.authenticateUser(res.token, res.name, res.teacher);
         this.setState({
-          auth: Auth.isUserAuthenticated()
+          currentUser: res.name,
+          isTeacher: res.teacher,
+          auth: Auth.isUserAuthenticated(res.name)
         });
       }).catch(err => {
         console.log(err);
@@ -159,14 +197,18 @@ class App extends Component {
       headers: {
         'Content-Type': 'application/json',
       }  
-    }).then(res => res.json())
-    .then(res => {
+    }).then(res => res.json())    .then(res => {
       console.log(res);
-      Auth.authenticateToken(res.token);
-      this.setState({
-        auth: Auth.isUserAuthenticated()
-      })
-    }).catch(err => console.log(err));
+        Auth.authenticateUser(res.token, res.name, res.teacher);
+        this.setState({
+          currentUser: res.name,
+          isTeacher: res.teacher,
+          auth: Auth.isUserAuthenticated(res.name)
+        })
+        console.log(this.state.currentUser)
+    }).catch(err => {
+      console.log(err);
+    })
   }
 
   handleLogout() {
@@ -177,8 +219,10 @@ class App extends Component {
         'Authorization': `Token ${Auth.getToken()}`,
       },
     }).then(res => {
-      Auth.deauthenticateToken();
+      Auth.deauthenticateUser();
        this.setState({
+        username: '',
+        password: '',
         auth: Auth.isUserAuthenticated()
       });
     }).catch(err => console.log(err));
@@ -187,18 +231,21 @@ class App extends Component {
   render() {
     return (
       
-      <div className="App">
+      <div className="App"> 
       	<nav className="navbar">
       	  <ul>
       	    <li><Link to="/">Home</Link></li>
       	    <li onClick={(e) => this.openModal('register')}>Sign Up</li>
             {!this.state.auth && <li onClick={(e) => this.openModal('login')}>Login</li>}
       	    {this.state.auth && <li onClick={this.handleLogout}>Logout</li>}
+            {this.state.auth && <li>Logged in as {this.state.currentUser}</li>}
           </ul>
       	</nav>
-        {this.renderModal()}    
-      	<Route path="/" component={Home} /> 
-       
+        {this.renderModal()}
+        <Route exact path="/" render={(props) => <Home auth={this.state.auth && this.state.isTeacher} />} />
+        <Route path="/classroom" component={ClassroomForm} />
+
+
       </div>
     );
   }
