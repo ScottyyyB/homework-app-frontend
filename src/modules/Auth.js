@@ -1,14 +1,30 @@
 class Auth {
-  static authenticateToken(token) {
+  static authenticateUser(token, name, teacher) {
   	sessionStorage.setItem('token', token);
+    sessionStorage.setItem('name', name);
+    sessionStorage.setItem('teacher', teacher);
   }
 
   static isUserAuthenticated() {
-  	return sessionStorage.getItem('token') !== null
+  	return sessionStorage.getItem('token') != undefined;
   }
 
-  static deauthenticateToken() {
+  static setName(name) {
+    return sessionStorage.setItem('name', name);
+  }
+
+  static getName() {
+    return sessionStorage.getItem('name');
+  }
+
+  static getTeacher() {
+    return sessionStorage.getItem('teacher');
+  }
+
+  static deauthenticateUser() {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('name');
+    sessionStorage.removeItem('teacher');
   }
 
   static getToken() {
