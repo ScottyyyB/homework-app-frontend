@@ -41,7 +41,7 @@ class ClassroomForm extends Component {
     
     if (name == 'grade') {
       this.setState({
-        displayUsers: this.state.users.filter(user => user.grade == value || value.includes(user.grade))
+        displayUsers: this.state.users.filter(user => value.includes(user.grade))
       });
     }
 
