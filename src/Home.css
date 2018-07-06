@@ -1,0 +1,18 @@
+.container {
+}
+
+.classroom-container {
+  width: 300px;
+  display: relative;
+  margin: 20px auto;
+}
+
+.classroom {
+  border: 3px solid black;
+  margin: 10px;
+  padding-bottom: 15px;
+}
+
+.classroom h2 {
+  border-bottom: 1.5px solid black;
+}

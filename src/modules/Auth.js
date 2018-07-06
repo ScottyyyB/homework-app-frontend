@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 class Auth {
   static authenticateUser(token, name, teacher) {
   	sessionStorage.setItem('token', token);
@@ -5,9 +7,23 @@ class Auth {
     sessionStorage.setItem('teacher', teacher);
   }
 
-  static isUserAuthenticated() {
-  	return sessionStorage.getItem('token') != undefined;
+  static getValue() {
+
   }
+
+  static userMatched = (token) => {
+    return fetch(`http://localhost:3002/api/v1/validate_token?token=${token}`)
+    .then((res) => {
+      return res
+    })
+    .then((data) => {
+      return data;
+    })
+  }
+
+  static isUserAuthenticated() {
+    return sessionStorage.getItem('token') != null;
+  };
 
   static setName(name) {
     return sessionStorage.setItem('name', name);

@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import Auth from './modules/Auth';
 
 import { Link, Route, Switch } from 'react-router-dom';
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router';
 
 import './App.css';
 
@@ -36,7 +36,9 @@ class App extends Component {
       auth: Auth.isUserAuthenticated(),
       typeOfModal: '',
       currentUser: Auth.getName(),
-      isTeacher: Auth.getTeacher()
+      isTeacher: Auth.getTeacher(),
+      errorMessage: [],
+      responseStatus: ''
   	};
 
   	this.openModal = this.openModal.bind(this);
@@ -46,10 +48,6 @@ class App extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.handleCheckBox = this.handleCheckBox.bind(this);
-  }
-
-  gradeCheck = (event) => {
-    return this.state.student ? 9 : null;
   }
 
   handleChange(e) {
@@ -64,15 +62,18 @@ class App extends Component {
     const name = e.target.name;
     const opposite =  ['student', 'teacher'].find(item => item != name);
     const gradeVal = opposite == 'teacher' ? null : this.state.grade;
-   
+
     this.setState({
       [name]: document.getElementById(`${name}Check`).checked = true,
       [opposite]: document.getElementById(`${opposite}Check`).checked = false,
     });
-  } 
+  }
 
-  updateCheck() {
-    
+  errorHandler(name) {
+    if (this.state.errorMessage.length > 0) {
+      const arr = this.state.errorMessage.filter(v => v.includes(name));
+      return arr.map((msg, i) => <h6 key={i} className="error-msg">{msg}</h6>);
+    }
   }
 
   renderModal() {
@@ -86,19 +87,21 @@ class App extends Component {
         >
 
           <h2 ref={subtitle => this.subtitle = subtitle}>Sign Up</h2>
-
           <form onSubmit={(e) => this.handleRegisterSubmit(e, this.state)}>
             <div className="user-input">
               <label>Email</label>
+              {this.errorHandler('Email')}
               <input onChange={this.handleChange} value={this.state.email} className="input" type="text" name="email"/>
             </div>
             <div className="user-input">
               <label>Name</label>
+              {this.errorHandler('Name')}
               <input onChange={this.handleChange} value={this.state.name} className="input" type="text" name="name"/>
             </div>
             <div className="user-input">
               <label>Password</label>
-              <input onChange={this.handleChange} value={this.state.password} className="input" type="text" name="password"/>
+              {this.errorHandler('Password')}
+              <input onChange={this.handleChange} value={this.state.password} className="input" type="password" name="password"/>
             </div>
             <div className="user-input">
               <label>Student</label>
@@ -121,7 +124,7 @@ class App extends Component {
           </form>
         </Modal>
       )
-    } 
+    }
     else {
       return (
         <Modal
@@ -132,7 +135,7 @@ class App extends Component {
         >
 
           <h2 ref={subtitle => this.subtitle = subtitle}>Login</h2>
-
+          {this.state.errorMessage.length > 0 && <h6 className="error-msg">Error with name or password</h6>}
           <form onSubmit={(e) => this.handleLoginSubmit(e, this.state)}>
             <div className="user-input">
               <label>Name</label>
@@ -140,7 +143,7 @@ class App extends Component {
             </div>
             <div className="user-input">
               <label>Password</label>
-              <input onChange={this.handleChange} value={this.state.password} className="input" type="text" name="password"/>
+              <input onChange={this.handleChange} value={this.state.password} className="input" type="password" name="password"/>
             </div>
             <div className="form-buttons">
               <button type="submit">Submit</button>
@@ -152,8 +155,9 @@ class App extends Component {
     }
   }
 
-  openModal(popup) {
-    this.setState({ typeOfModal: popup, modalIsOpen: true })
+  openModal(name) {
+    this.setState({ typeOfModal: name, modalIsOpen: true });
+    this.state.errorMessage.length > 0 ? this.setState({ errorMessage: []}) : null;
   	console.log("modal open!");
   }
 
@@ -161,8 +165,8 @@ class App extends Component {
     this.subtitle.style.color = '#f00';
   }
 
-  closeModal() {
-    this.setState({modalIsOpen: false});
+  closeModal(name) {
+    this.setState({ typeOfModal: name, modalIsOpen: false});
   }
 
   handleRegisterSubmit(e, data) {
@@ -177,6 +181,7 @@ class App extends Component {
       }
     }).then(res => res.json())
     .then(res => {
+      if (res.token) {
         console.log(res);
         Auth.authenticateUser(res.token, res.name, res.teacher);
         this.setState({
@@ -184,6 +189,11 @@ class App extends Component {
           isTeacher: res.teacher,
           auth: Auth.isUserAuthenticated(res.name)
         });
+        this.closeModal()
+      } else {
+        console.log(res.errors);
+        this.setState({ errorMessage: res.errors});
+      }
       }).catch(err => {
         console.log(err);
       })
@@ -196,18 +206,23 @@ class App extends Component {
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
-      }  
-    }).then(res => res.json())    .then(res => {
-      console.log(res);
+      }
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.token) {
+        console.log(res);
         Auth.authenticateUser(res.token, res.name, res.teacher);
         this.setState({
           currentUser: res.name,
           isTeacher: res.teacher,
-          auth: Auth.isUserAuthenticated(res.name)
-        })
-        console.log(this.state.currentUser)
-    }).catch(err => {
-      console.log(err);
+          auth: Auth.isUserAuthenticated()
+        });
+        this.closeModal()
+      } else {
+        this.setState({errorMessage: res.errors});
+        // console.log(this.state.errorMessage[0].detail);
+      }
     })
   }
 
@@ -230,8 +245,8 @@ class App extends Component {
 
   render() {
     return (
-      
-      <div className="App"> 
+
+      <div className="App">
       	<nav className="navbar">
       	  <ul>
       	    <li><Link to="/">Home</Link></li>
@@ -242,10 +257,12 @@ class App extends Component {
           </ul>
       	</nav>
         {this.renderModal()}
-        <Route exact path="/" render={(props) => <Home auth={this.state.auth && this.state.isTeacher} />} />
-        <Route path="/classroom" component={ClassroomForm} />
-
-
+        { this.state.auth &&
+          <Switch>
+            <Route exact path="/" render={(props) => <Home auth={this.state.auth} teacher={this.state.isTeacher} />} />
+            <Route path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
+          </Switch>
+        }
       </div>
     );
   }
