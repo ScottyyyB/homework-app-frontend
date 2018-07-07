@@ -4,6 +4,7 @@
 
 .user-input label {
   display: block;
+  padding-bottom: 8px;
 }
 
 .user-input {
@@ -12,4 +13,25 @@
 
 .user-input span {
   margin: 10px 5px;
+}
+
+table {
+  margin: auto;
+  border: 2px solid lightgray;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+
+th {
+  border-bottom: 6px solid lightgray;
+}
+
+.error-msg {
+  color: red;
+  margin: 0;
+  margin-bottom: 5px;
 }
