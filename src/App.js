@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Home from './components/Home';
 import ClassroomForm from './components/ClassroomForm';
+import Classroom from './components/Classroom';
 import Modal from 'react-modal';
 import Auth from './modules/Auth';
 
@@ -260,7 +261,9 @@ class App extends Component {
         { this.state.auth &&
           <Switch>
             <Route exact path="/" render={(props) => <Home auth={this.state.auth} teacher={this.state.isTeacher} />} />
-            <Route path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
+            <Route exact path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
+            <Route exact path="/classroom/:id" render={(props) => <Classroom />} />
+
           </Switch>
         }
       </div>

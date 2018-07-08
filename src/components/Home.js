@@ -1,6 +1,7 @@
 import React, { Component} from 'react';
 import ReactDOM from 'react-dom';
 import ClassroomForm from './ClassroomForm';
+import Classroom from './Classroom';
 import { Link, Route, Switch, Button } from 'react-router-dom';
 import Auth from '../modules/Auth';
 import '../Home.css'
@@ -10,8 +11,11 @@ class Home extends Component {
   	super();
 
     this.state = {
-      classrooms: []
+      classrooms: [],
+      classroomId: null,
     }
+
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
@@ -29,12 +33,20 @@ class Home extends Component {
     })
   }
 
+  handleChange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      [name]: value
+    })
+  }
+
 
   render() {
   	return (
   	  <div className="container">
   	    <h1>Homework App</h1>
-  	    {this.props.auth && <Link to="/classroom"><button>New Classroom</button></Link>}
+  	    <Link to="/classroom"><button>New Classroom</button></Link>
         <div className="classroom-container">
           { this.state.classrooms.map(classroom => {
             return (
@@ -42,7 +54,7 @@ class Home extends Component {
                <h2> Grade: {classroom.grade} {classroom.name}</h2>
                <h3>Teacher: {classroom.teacher} </h3>
                <h3>Students: {classroom['student_count']}</h3>
-               <button>Enter Classroom</button>
+               <Link to={{ pathname: '/classroom/' + classroom.id, query: { classroomId: classroom.id} }}><button onClick={this.handleChange} name="classroomId" value={classroom.id}>Enter Classroom</button></Link>
              </div>
             )
            })}
