@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import Home from './components/Home';
 import ClassroomForm from './components/ClassroomForm';
 import Classroom from './components/Classroom';
+import NoMatch from './components/NoMatch';
 import Modal from 'react-modal';
 import Auth from './modules/Auth';
+
 
 import { Link, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
@@ -262,6 +264,7 @@ class App extends Component {
             <Route exact path="/" render={(props) => <Home auth={this.state.auth} teacher={this.state.isTeacher} />} />
             <Route exact path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
             <Route exact path="/classroom/:id" component={Classroom} />
+            <Route component={NoMatch} />
           </Switch>
         }
       </div>
