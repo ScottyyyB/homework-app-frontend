@@ -1,0 +1,9 @@
+.classroom-board {
+  border: 2px solid black;
+}
+
+.board-section {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 10px;
+}

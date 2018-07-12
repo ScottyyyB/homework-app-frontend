@@ -5,6 +5,7 @@ import { URL, URLSearchParams } from 'url';
 import { Link, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import Home from './Home';
+import '../stylesheets/ClassroomForm.css';
 
 class ClassroomForm extends Component {
   constructor() {
@@ -116,7 +117,6 @@ class ClassroomForm extends Component {
     }
   	return (
   	  <div>
-        <li><Link to="/">Home</Link></li>
         <Route exact path="/" component={Home} />
   	    <h1>Create Classroom</h1>
   	    <form onSubmit={(e) => this.handleClassRoomSubmit(e, {name: this.state.name, grade: this.state.classroomGrade, user_ids: this.state.userIds})}>
@@ -138,7 +138,7 @@ class ClassroomForm extends Component {
             </select>
           </div>
 
-          {this.state.users && <div className="user-input">
+          <div className="user-input">
             <h4>Add Students</h4>
             <div className="user-filters user-input">
               <span style={{display: 'inline'}}>Filter By Grade: </span>
@@ -155,7 +155,7 @@ class ClassroomForm extends Component {
             <div className="errors-section">
               {this.errorHandler('User ids')}
             </div>
-            <table className="classroom-table">
+            <table>
               <tr>
                 <th>Select {this.state.userIds.length > 0 ? this.state.userIds.length : null}</th>
                 <th>Name</th>
@@ -171,7 +171,7 @@ class ClassroomForm extends Component {
               })
             }
             </table>
-          </div>}
+          </div>
           <button type="submit">Create Classroom</button>
   	    </form>
       </div>

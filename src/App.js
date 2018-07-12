@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import Home from './components/Home';
 import ClassroomForm from './components/ClassroomForm';
+import Classroom from './components/Classroom';
 import Modal from 'react-modal';
 import Auth from './modules/Auth';
 
 import { Link, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 
-import './App.css';
+import './stylesheets/App.css';
 
 const customStyles = {
   content : {
@@ -37,8 +38,7 @@ class App extends Component {
       typeOfModal: '',
       currentUser: Auth.getName(),
       isTeacher: Auth.getTeacher(),
-      errorMessage: [],
-      responseStatus: ''
+      errorMessage: []
   	};
 
   	this.openModal = this.openModal.bind(this);
@@ -260,7 +260,8 @@ class App extends Component {
         { this.state.auth &&
           <Switch>
             <Route exact path="/" render={(props) => <Home auth={this.state.auth} teacher={this.state.isTeacher} />} />
-            <Route path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
+            <Route exact path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
+            <Route exact path="/classroom/:id" component={Classroom} />
           </Switch>
         }
       </div>
