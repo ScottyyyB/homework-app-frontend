@@ -38,9 +38,7 @@ class App extends Component {
       typeOfModal: '',
       currentUser: Auth.getName(),
       isTeacher: Auth.getTeacher(),
-      errorMessage: [],
-      responseStatus: '',
-      classroomIds: []
+      errorMessage: []
   	};
 
   	this.openModal = this.openModal.bind(this);
@@ -50,21 +48,6 @@ class App extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.handleCheckBox = this.handleCheckBox.bind(this);
-  }
-
-  componentDidMount() {
-    fetch('http://localhost:3002/api/v1/classrooms', {
-      headers: {
-        token: Auth.getToken(),
-        'Authorization': `Token ${Auth.getToken()}`
-      }
-    }).then(res => res.json())
-    .then(res => {
-      console.log(res);
-      this.setState({
-        classroomIds: res
-      });
-    })
   }
 
   handleChange(e) {
