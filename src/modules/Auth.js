@@ -46,6 +46,21 @@ class Auth {
   static getToken() {
   	return sessionStorage.getItem('token');
   }
+
+  static fetchClassroom() {
+    return fetch(`http://localhost:3002/api/v1/classrooms/${this.props.match.params.id}`, {
+     headers: {
+       token: Auth.getToken(),
+       'Authorization': `Token ${Auth.getToken()}`
+     }
+   }).then(res => res.json())
+   .then(res => {
+     console.log(res);
+     this.setState({
+       classroom: res
+     })
+    })
+  }
 }
 
 export default Auth;

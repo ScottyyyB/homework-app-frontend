@@ -4,7 +4,7 @@ import ClassroomForm from './ClassroomForm';
 import Classroom from './Classroom';
 import { Link, Route, Switch, Button } from 'react-router-dom';
 import Auth from '../modules/Auth';
-import '../Home.css'
+import '../stylesheets/Home.css'
 
 class Home extends Component {
   constructor() {
@@ -50,16 +50,15 @@ class Home extends Component {
         <div className="classroom-container">
           { this.state.classrooms.map(classroom => {
             return (
-             <div className="classroom">
+             <div className="classroom" id="classroom">
                <h2> Grade: {classroom.grade} {classroom.name}</h2>
                <h3>Teacher: {classroom.teacher} </h3>
                <h3>Students: {classroom['student_count']}</h3>
-               <Link to={{ pathname: '/classroom/' + classroom.id, query: { classroomId: classroom.id} }}><button onClick={this.handleChange} name="classroomId" value={classroom.id}>Enter Classroom</button></Link>
+               <Link to={{pathname: `/classroom/${classroom.id}`, state: this.state.classrooms}}><button onClick={this.handleChange} name="classroomId" value={classroom.id}>Enter Classroom</button></Link>
              </div>
             )
            })}
         </div>
-
   	  </div>
   	)
   }
