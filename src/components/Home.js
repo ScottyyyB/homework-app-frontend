@@ -11,8 +11,7 @@ class Home extends Component {
   	super();
 
     this.state = {
-      classrooms: [],
-      classroomId: null,
+      classrooms: []
     }
 
     this.handleChange = this.handleChange.bind(this);
