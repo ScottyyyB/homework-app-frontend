@@ -278,7 +278,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" render={(props) => <Home auth={this.state.auth} teacher={this.state.isTeacher} />} />
             <Route exact path="/classroom" render={(props) => <ClassroomForm teacher={this.state.isTeacher} />} />
-            <Route exact path="/classroom/:id" component={Classroom} render={(props) => <Classroom classrooms={this.state.classroomIds} />} />
+            <Route exact path="/classroom/:id" component={Classroom} />
           </Switch>
         }
       </div>

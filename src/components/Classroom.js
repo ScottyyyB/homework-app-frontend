@@ -11,8 +11,7 @@ class Classroom extends Component {
     super();
     this.state = {
       isLoaded: false,
-      classroom: {},
-      classroomFound: true
+      classroom: {}
     }
   }
 
@@ -32,29 +31,15 @@ class Classroom extends Component {
         })
       } else {
         this.setState({
-          isLoaded: true,
-          classroomFound: false
+          isLoaded: true
         })
       }
-    })
-
-    fetch('http://localhost:3002/api/v1/classrooms', {
-      headers: {
-        token: Auth.getToken(),
-        'Authorization': `Token ${Auth.getToken()}`
-      }
-    }).then(res => res.json())
-    .then(res => {
-      console.log(res);
-      this.setState({
-        classroomId: res.some(classroom => classroom.id == this.props.match.params.id)
-      });
     })
   }
 
   render() {
     if (this.state.isLoaded) {
-      if (!this.state.classroomFound) {
+      if (!this.state.classroom.id) {
         return <Redirect to="/" />;
       }
       return (
