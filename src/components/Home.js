@@ -54,7 +54,7 @@ class Home extends Component {
                <h2> Grade: {classroom.grade} {classroom.name}</h2>
                <h3>Teacher: {classroom.teacher} </h3>
                <h3>Students: {classroom['student_count']}</h3>
-               <Link to={{pathname: `/classroom/${classroom.id}`, state: this.state.classrooms}}><button onClick={this.handleChange} name="classroomId" value={classroom.id}>Enter Classroom</button></Link>
+               <Link to={`/classroom/${classroom.id}`}><button onClick={this.handleChange} name="classroomId" value={classroom.id}>Enter Classroom</button></Link>
              </div>
             )
            })}
